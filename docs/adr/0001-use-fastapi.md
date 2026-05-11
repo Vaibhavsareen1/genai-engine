@@ -136,9 +136,9 @@ Before we understand how the WSGI servers are built architecturally we need to u
 - By default each worker handles only 1 Request at a time. This configuration can be change if the tasks are more I/O bound tasks then number of threads per worker can be increased as 1 Request at a time is not scalable to handle multiple requests
 
 ### 2.5 Limitation of WSGI
-- WSGI was created during an era where the web applications were simple and there was not much online traffic due to which the communication betweent the client and server was strictly **synchronous**.
+- WSGI was created during an era where the web applications were simple and there was not much online traffic due to which the communication between the client and server was strictly **synchronous**.
 - The threads are blocked till the request is completed and other requests can't be handled during this time.
-- To handle **10,000 concurrent** requests we have to spawn **10,000 workers** which is not **monetarily** feasible (as this will also come with replication of 10000 instances of python interpretors leading to increase in CPU cores and RAM).
+- To handle **10,000 concurrent** requests we have to spawn **10,000 workers** which is not **monetarily** feasible (as this will also come with replication of 10000 instances of python interpreters leading to increase in CPU cores and RAM).
 - The modern era also demands long lived connections to perform long complicated tasks and because of this synchronous behaviour it becomes very difficult to scale WSGI servers
 - The WSGI contract also converts the entire HTTP request into a `environ` dict and sends it to the server to process it. 
   - So even for a simple task of returning **hello** the server will package the request into one `environ` dictionary. The time it takes to package `environ` is more than the time it takes to handle the simple task of processing simple requests.
@@ -195,7 +195,7 @@ There are 2 concepts that  did not exist in the WSGI world
 - In WSGI servers if we perform `requests.get('http//:some-site.com')` the thread on the server (worker) gets blocked till the request is completed.
 - In ASGI when we use coroutines we can voluntarily give control back by using `await`
 - `await` does 3 things
-  1. **Pause**: It marks a "**yield point**". It tells python interpretor that it is waiting for a set of instructions to get executed and is idle for that period of time.
+  1. **Pause**: It marks a "**yield point**". It tells python interpreter that it is waiting for a set of instructions to get executed and is idle for that period of time.
   2. **Handover**: It voluntarily packages up it's current state and hands control back to the ASGI server's engine **Event Loop**
   3. **Resume**: The engine goes off and does other work. The engine will return to the awaited request to see if the instructions have executed if they have not it will again go and do some other work. If they have then it will start executing instructions after the yield point.
 - This voluntarily handover of control while the request waits is why ASGI servers are used for data intensive applications where the data takes time to be processed by other services.
@@ -203,10 +203,10 @@ There are 2 concepts that  did not exist in the WSGI world
 
 ### 3.5 ASGI's engine
 - **Event Loop** is the engine of ASGI servers which allows the server to handle the execution of coroutines.
-- The event loop is a continous while loop running inside a **single** thread.
-- The job of the event loop is to continously monitor events and schedule the execution of coroutines associated with those events.
+- The event loop is a continuous while loop running inside a **single** thread.
+- The job of the event loop is to continuously monitor events and schedule the execution of coroutines associated with those events.
 - When you start a ASGI server the server registers coroutines with the event loop
-- The loop uses low level OS primitives to continously monitor these events by monitoring if the network sockets have received any data
+- The loop uses low level OS primitives to continuously monitor these events by monitoring if the network sockets have received any data
 - If a socket receives any data then the loop wakes up the specific coroutine that will process the incoming data.
 - If the coroutine triggers await it will perform **cooperative multitasking** and return control back to the event loop. This cycle repeats and the event loop makes sure that the CPU never sits idle.
 - The efficiency of the event loop depends upon the type of tasks the coroutine performs.
