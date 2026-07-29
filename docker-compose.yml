@@ -1,0 +1,18 @@
+services:
+  ai-chat-service:
+    container_name: ai-chat-service
+    build:
+      context: .
+      dockerfile: Dockerfile.ChatServiceImage
+      args:
+        - BASE_IMAGE=ai-core-image:latest
+    env_file: .env
+    command: /app/startup_script.sh
+    ports:
+      - 8001:8000
+    networks: 
+      - ai-network
+
+networks:
+  ai-network:
+    external: true

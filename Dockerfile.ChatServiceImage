@@ -1,0 +1,29 @@
+ARG PYTHON_VERSION=3.12
+
+ARG BASE_IMAGE=ai-core-image:latest
+
+FROM ${BASE_IMAGE} AS builder
+
+
+FROM python:${PYTHON_VERSION}-slim AS runner
+
+RUN mkdir /app
+
+RUN useradd -u 1000 --create-home --shell /bin/bash appuser
+
+WORKDIR /app
+
+USER appuser
+
+COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
+
+COPY --chown=appuser:appuser chat_service/app .
+
+COPY --chown=appuser:appuser library ./library
+
+COPY --chown=appuser:appuser chat_service/startup_script.sh /app/startup_script.sh
+
+RUN chmod +x /app/startup_script.sh
+
+ENV PATH="/home/appuser/.local/bin:$PATH"
+
