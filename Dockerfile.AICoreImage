@@ -1,0 +1,9 @@
+# Base image that all AI services will use to build their images
+# Here we are only installing dependencies stored in requirements.txt 
+ARG PYTHON_VERSION=3.12
+
+FROM python:${PYTHON_VERSION}-slim
+
+COPY requirements.txt /requirements.txt
+
+RUN pip install --user --no-cache-dir -r requirements.txt
